@@ -1,79 +1,95 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Random Moving Text</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-    }
+<meta charset="UTF-8">
+<title>Text Bounce</title>
 
-    .text {
-      position: absolute;
-      white-space: nowrap;
-      font-size: 18px;
-      animation: fall linear infinite;
-    }
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  background:#000;
+  font-family:monospace;
+}
 
-    @keyframes fall {
-      0% {
-        transform: translateY(-50px);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(110vh);
-        opacity: 0;
-      }
-    }
-  </style>
+.text{
+  position:absolute;
+  white-space:nowrap;
+  font-size:30px;
+  font-weight:bold;
+}
+
+/* Tick xanh */
+.tick{
+  display:inline-block;
+  width:28px;
+  height:28px;
+  background:#00c853;
+  color:#fff;
+  text-align:center;
+  line-height:28px;
+  border-radius:6px;
+  margin-right:10px;
+}
+</style>
 </head>
+
 <body>
 
 <script>
-  // 2 câu bạn muốn
-  const texts = [
-    "Xóc Đĩa Tứ Linh",
-    "Tài Xỉu Mini"
-  ];
+const texts=[
+  {t:"Xóc Đĩa Tứ Linh",c:"#00ff00"},
+  {t:"Tài Xỉu Mini",c:"#00bfff"}
+];
 
-  let currentIndex = 0; // bắt đầu với câu đầu
+let i=0;
 
-  // Đổi câu mỗi 60 giây
-  setInterval(() => {
-    currentIndex = (currentIndex + 1) % texts.length;
-  }, 60000);
+// tạo chữ
+const d=document.createElement("div");
+d.className="text";
+document.body.appendChild(d);
 
-  function createText() {
-    const text = document.createElement("div");
-    text.className = "text";
+// vị trí ban đầu (QUAN TRỌNG)
+let x=100, y=100;
+d.style.left = x + "px";
+d.style.top = y + "px";
 
-    // Hiển thị câu hiện tại
-    text.innerText = texts[currentIndex];
+// tốc độ chậm
+let dx=1+Math.random()*1.5;
+let dy=1+Math.random()*1.5;
 
-    // Random vị trí ngang
-    text.style.left = Math.random() * window.innerWidth + "px";
+// render nội dung
+function render(){
+  d.innerHTML = `<span class="tick">✔</span><span style="color:${texts[i].c}">${texts[i].t}</span>`;
+}
 
-    // Random tốc độ
-    const duration = 3 + Math.random() * 5;
-    text.style.animationDuration = duration + "s";
+// đổi câu mỗi 60s
+setInterval(()=>{
+  i=(i+1)%2;
+  render();
+},60000);
 
-    // Random size
-    text.style.fontSize = (16 + Math.random() * 20) + "px";
+// chuyển động đập tường
+function move(){
+  const w=window.innerWidth;
+  const h=window.innerHeight;
+  const rect=d.getBoundingClientRect();
 
-    document.body.appendChild(text);
+  x+=dx;
+  y+=dy;
 
-    // Xóa sau khi chạy xong
-    setTimeout(() => {
-      text.remove();
-    }, duration * 1000);
-  }
+  if(x<=0 || x+rect.width>=w) dx*=-1;
+  if(y<=0 || y+rect.height>=h) dy*=-1;
 
-  // Tạo chữ liên tục
-  setInterval(createText, 300);
+  d.style.left=x+"px";
+  d.style.top=y+"px";
+
+  requestAnimationFrame(move);
+}
+
+// chạy
+render();   // 🔥 phải gọi trước
+move();
 </script>
 
 </body>
